@@ -16,7 +16,7 @@ class TokenType {
   }
 
   @override
-  String toString() => "$name -> /${matcher.pattern}/";
+  String toString() => "<%$name%>";
 }
 
 class Token {

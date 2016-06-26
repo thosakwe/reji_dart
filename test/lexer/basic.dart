@@ -68,10 +68,10 @@ main() {
 
   test("nested rule", () async {
     reji.Lexer lexer = new reji.Lexer(debug: true);
-    lexer.lex("DOT", "\.");
-    lexer.lex("DIGIT", "[0-9]+");
-    lexer.lex("DIGITS", "<%DIGIT%>+");
-    lexer.lex("DECIMAL", "<%DIGITS%>+(<%DOT%><%DIGITS%>)").then((token) => num.parse(token.text));
+    reji.TokenType DOT = lexer.lex("DOT", "\.");
+    reji.TokenType DIGIT = lexer.lex("DIGIT", "[0-9]+");
+    reji.TokenType DIGITS = lexer.lex("DIGITS", "$DIGIT+");
+    lexer.lex("DECIMAL", "$DIGITS($DOT$DIGITS)").then((token) => num.parse(token.text));
 
     lexer.scan("420.69");
 
