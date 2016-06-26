@@ -1,0 +1,7 @@
+name: reji
+version: 1.0.0-dev
+description: Regex-based lexer and parser duo.
+homepage: https://github.com/thosakwe/reji_dart.git
+author: Tobe O <thosakwe@gmail.com>
+dev_dependencies:
+    test: ">=0.12.14 <0.13.0"
