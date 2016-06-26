@@ -4,14 +4,34 @@ import 'dart:async';
 import 'shared.dart';
 
 class Parser implements StreamTransformer<Token, ParseTree> {
-	StreamController<ParseTree> _ast = new StreamController<ParseTree>();
+  StreamController<ParseTree> _treeStream = new StreamController<ParseTree>();
 
-	Stream<ParseTree> bind(Stream<Token> tokenStream) {
-		tokenStream.listen(parse);
-		return _ast.stream;
-	}
+  Stream<ParseTree> get treeStream => _treeStream.stream;
 
-	parse(Token token) {
-		
-	}
+
+  String _strand = "";
+
+  Stream<ParseTree> bind(Stream<Token> tokenStream) {
+    tokenStream.toList().then(transform);
+    return _treeStream.stream;
+  }
+
+  ParseTreeType parse(String name, List<String> tokenTypes) {
+
+  }
+
+  transform(List<Token> tokens) {
+    for (Token token in tokens) {
+      if (_strand.isNotEmpty)
+        _strand += " ";
+
+      _strand += token.type.name;
+    }
+
+    _buildTrees(tokens);
+  }
+
+  _buildTrees(List<Token> tokens) {
+    _treeStream.close();
+  }
 }

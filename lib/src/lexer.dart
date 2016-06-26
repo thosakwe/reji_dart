@@ -93,12 +93,14 @@ class Lexer {
     }
 
     while (str.length > 0) {
+      List<Token> potential = [];
+
       for (TokenType tokenType in tokenTypes) {
         MatchFilter filter = filters[tokenType];
         MatchFilter skipFilter = skipFilters[tokenType];
         Match match = tokenType.matcher.firstMatch(str);
 
-        if (match != null) {
+        if (match != null && match.start == 0) {
           bool canTokenize = true;
 
           if (debug) {
@@ -110,6 +112,12 @@ class Lexer {
 
             if (skipFilter != null)
               canTokenize = !skipFilter(match);
+
+            if (!canTokenize) {
+              // To skip a token, we have to actually skip it:
+              str = str.substring(match[0].length);
+              continue;
+            }
           } else if (filter != null) canTokenize = filter(match);
 
           if (canTokenize) {
@@ -118,11 +126,32 @@ class Lexer {
             if (tokenType.transformer != null)
               token.value = tokenType.transformer(token);
 
-            _tokenStream.add(token);
-
-            str = str.substring(match[0].length);
+            potential.add(token);
           }
         }
+      }
+
+      // Choose the longest match
+      int longestLength = 0;
+      Token result;
+
+      potential.forEach((Token token) {
+        if (token.text.length > longestLength) {
+          longestLength = token.text.length;
+          result = token;
+        }
+      });
+
+      if (result != null) {
+        _tokenStream.add(result);
+        str = str.substring(result.match[0].length);
+      } else if (str.length > 1) {
+        // If there's no match at this index, move ahead one char
+        str = str.substring(1);
+      } else {
+        // If this was the last char, we're done matching, go ahead
+        // and close the stream, bub
+        break;
       }
     }
 
