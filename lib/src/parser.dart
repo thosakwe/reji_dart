@@ -17,7 +17,7 @@ class Parser implements StreamTransformer<Token, ParseTree> {
   }
 
   ParseTreeType parse(String name, List<String> tokenTypes) {
-
+    return null;
   }
 
   transform(List<Token> tokens) {

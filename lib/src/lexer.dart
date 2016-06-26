@@ -84,8 +84,21 @@ class Lexer {
     }
   }
 
+  List<int> getIndicesOfNewline(String input) {
+    List<int> result = [];
+    String str = input;
+    int i = input.indexOf("\n");
+
+    while (i != -1) {
+      result.add(i);
+      i = input.indexOf("\n");
+    }
+    return result;
+  }
+
   void scan(String input) {
     _expandRules();
+    List<int> newlines = getIndicesOfNewline(input);
     String str = input;
 
     if (debug) {
@@ -121,7 +134,24 @@ class Lexer {
           } else if (filter != null) canTokenize = filter(match);
 
           if (canTokenize) {
-            Token token = new Token(tokenType, match);
+            // Compute the absolute index of this match in the
+            // original string
+            int offset = input.length - str.length;
+
+            // See how many newlines we have passed
+            int line = 1;
+            int indexInLine = offset;
+
+            if (newlines.isNotEmpty) {
+              List<int> passedNewlines = newlines.where((i) => i < offset)
+                  .toList();
+              line = passedNewlines.length;
+              indexInLine = offset - passedNewlines.last;
+            }
+
+            Token token = new Token(
+                tokenType, match, line: line,
+                indexInLine: indexInLine);
 
             if (tokenType.transformer != null)
               token.value = tokenType.transformer(token);
